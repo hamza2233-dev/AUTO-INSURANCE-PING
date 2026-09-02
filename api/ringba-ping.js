@@ -1,32 +1,37 @@
-export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+document.getElementById('autoInsuranceForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
 
-  const { cid } = req.body;
+    const submitBtn = document.getElementById('submitBtn');
+    const responseMsg = document.getElementById('responseMessage');
+    
+    // Get phone field value
+    const phoneInput = document.getElementById('phone').value.trim();
+    const cleanPhone = phoneInput.replace(/\D/g, ''); // Keep only numbers
 
-  if (!cid) {
-    return res.status(400).json({ error: 'Missing required Caller ID' });
-  }
+    // UI Loading State
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Processing Request...';
+    responseMsg.className = 'hidden mt-4 text-center text-sm font-medium p-3 rounded-lg';
 
-  const payload = {
-    CID: cid,
-    exposeCallerId: "yes"
-  };
+    try {
+        // Send Ping to Ringba Endpoint
+        const ringbaUrl = `https://rtb.ringba.com/v1/production/bf95a1c2fdfa4dc189c24360e9b05252.json?CID=${encodeURIComponent(cleanPhone)}&exposeCallerId=Yes`;
+        
+        await fetch(ringbaUrl, {
+            method: 'GET',
+            mode: 'no-cors' // Handles cross-origin tracking pixel/ping seamlessly
+        });
 
-  try {
-    const response = await fetch('https://rtb.ringba.com/v1/production/bf95a1c2fdfa4dc189c24360e9b05252.json', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload)
-    });
+        // Show Success Message
+        responseMsg.textContent = 'Success! We are matching you with the best rates now.';
+        responseMsg.className = 'mt-4 text-center text-sm font-medium p-3 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+        document.getElementById('autoInsuranceForm').reset();
 
-    const resultText = await response.text();
-    return res.status(200).send(resultText);
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
-}
-
+    } catch (error) {
+        responseMsg.textContent = 'An error occurred. Please try calling our agents directly.';
+        responseMsg.className = 'mt-4 text-center text-sm font-medium p-3 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20';
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Get My Free Quotes';
+    }
+});
