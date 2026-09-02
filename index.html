@@ -3,104 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Get Affordable Auto Insurance Quotes | Instant Match</title>
+    <title>Auto Insurance Ping</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#eff6ff',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
 </head>
-<body class="h-full font-sans antialiased text-slate-100 flex flex-col justify-between bg-gradient-to-br from-slate-900 via-slate-800 to-blue-950">
+<body class="h-full font-sans antialiased text-slate-100 flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-blue-950">
 
-    <!-- Header / Navbar -->
-    <header class="w-full py-5 px-6 md:px-12 flex justify-between items-center border-b border-slate-800/60 backdrop-blur-md bg-slate-900/40 sticky top-0 z-50">
-        <div class="flex items-center space-x-2">
-            <span class="text-2xl font-black tracking-wider bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">AutoCover US</span>
+    <div class="max-w-md w-full mx-4 bg-slate-800/80 backdrop-blur-xl border border-slate-700/60 rounded-2xl shadow-2xl p-8">
+        
+        <div class="text-center mb-6">
+            <h1 class="text-2xl font-extrabold text-white tracking-tight">Auto Insurance Ping</h1>
+            <p class="text-slate-400 text-xs mt-1">Enter your phone number to dispatch caller ID.</p>
         </div>
-        <div class="text-sm font-medium text-slate-300 hidden sm:block">
-            📞 Speak with an Expert: <a href="tel:8005550199" class="text-blue-400 font-semibold hover:underline">(800) 555-0199</a>
-        </div>
-    </header>
 
-    <!-- Main Content Container -->
-    <main class="flex-grow flex items-center justify-center px-4 py-12">
-        <div class="max-w-xl w-full bg-slate-800/80 backdrop-blur-xl border border-slate-700/60 rounded-2xl shadow-2xl p-8 sm:p-10">
-            
-            <!-- Form Title -->
-            <div class="text-center mb-8">
-                <span class="inline-block py-1 px-3 rounded-full bg-blue-500/10 text-blue-400 text-xs font-semibold uppercase tracking-wider mb-3">Auto Insurance Ping Form</span>
-                <h1 class="text-3xl font-extrabold text-white tracking-tight">Compare Rates & Save Big</h1>
-                <p class="text-slate-400 text-sm mt-2">Fill out the quick details below to get matched with top US providers instantly.</p>
+        <!-- Ping Form -->
+        <form id="pingForm" class="space-y-4">
+            <div>
+                <label class="block text-xs font-semibold uppercase text-slate-300 mb-1">Caller ID (Phone Number)</label>
+                <input type="tel" name="phone" id="phone" required placeholder="(555) 000-0000" 
+                    class="w-full px-4 py-3 bg-slate-900/60 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
             </div>
 
-            <!-- Ping Form -->
-            <form id="autoInsuranceForm" class="space-y-5">
-                
-                <!-- Full Name -->
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-300 mb-1">Full Name</label>
-                    <input type="text" name="name" id="name" required placeholder="John Doe" 
-                        class="w-full px-4 py-3 bg-slate-900/60 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
-                </div>
+            <button type="submit" id="submitBtn" 
+                class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg shadow-lg shadow-blue-500/25 transition">
+                Send Ping
+            </button>
+        </form>
 
-                <!-- Email Address -->
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-300 mb-1">Email Address</label>
-                    <input type="email" name="email" id="email" required placeholder="john@example.com" 
-                        class="w-full px-4 py-3 bg-slate-900/60 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
-                </div>
+        <!-- Status Message -->
+        <div id="responseMessage" class="hidden mt-4 text-center text-xs font-medium p-3 rounded-lg"></div>
 
-                <!-- Phone Number (Ringba CID Target) -->
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-300 mb-1">Phone Number (US)</label>
-                    <input type="tel" name="phone" id="phone" required placeholder="(555) 000-0000" 
-                        class="w-full px-4 py-3 bg-slate-900/60 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
-                </div>
-
-                <!-- Vehicle / Zip Code Grid -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-300 mb-1">Vehicle Year/Model</label>
-                        <input type="text" name="vehicle" id="vehicle" placeholder="e.g., 2022 Honda Civic" 
-                            class="w-full px-4 py-3 bg-slate-900/60 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-300 mb-1">ZIP Code</label>
-                        <input type="text" name="zip" id="zip" required placeholder="90210" 
-                            class="w-full px-4 py-3 bg-slate-900/60 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
-                    </div>
-                </div>
-
-                <!-- Submit Button -->
-                <button type="submit" id="submitBtn" 
-                    class="w-full py-4 mt-2 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white font-bold rounded-lg shadow-lg shadow-blue-500/25 transition-all duration-200 transform active:scale-[0.99]">
-                    Get My Free Quotes
-                </button>
-            </form>
-
-            <!-- Status Message Box -->
-            <div id="responseMessage" class="hidden mt-4 text-center text-sm font-medium p-3 rounded-lg"></div>
-
-        </div>
-    </main>
-
-    <!-- Footer -->
-    <footer class="w-full py-6 text-center text-xs text-slate-500 border-t border-slate-800/60">
-        &copy; 2026 AutoCover US. All rights reserved. Secure 256-bit SSL encrypted lead submission.
-    </footer>
+    </div>
 
     <!-- Link external JS -->
     <script src="ping.js"></script>
