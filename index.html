@@ -1,1 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AUTO INSURANCE</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col justify-center items-center p-4">
+
+    <div class="w-full max-w-md bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-emerald-600 to-teal-600 p-6 text-center relative">
+            <div class="absolute top-3 right-3 flex items-center space-x-1.5 bg-black/20 backdrop-blur-md px-2.5 py-1 rounded-full text-xs font-medium text-emerald-200 border border-emerald-400/30">
+                <span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
+                <span id="status-text">Ready</span>
+            </div>
+            <h1 class="text-xl font-bold tracking-wide text-white uppercase"><i class="fa-solid fa-bug mr-2"></i>AUTO INSURANCE</h1>
+            <p class="text-xs text-emerald-100 mt-1">AUTO INSURANCE</p>
+        </div>
+
+        <!-- Form Body -->
+        <form id="pingForm" class="p-6 space-y-4">
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">
+                    <i class="fa-solid fa-phone-volume mr-1.5 text-emerald-600"></i> Caller ID (CID)
+                </label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400 font-mono text-sm">+1</span>
+                    <input type="tel" id="cid" name="cid" required placeholder="5551234567" 
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-10 pr-4 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition font-mono text-sm">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">
+                    <i class="fa-solid fa-stopwatch mr-1.5 text-emerald-600"></i> Auto Ping Loop Interval
+                </label>
+                <select id="auto_interval" class="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-slate-800 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition text-sm">
+                    <option value="0">Manual / Off</option>
+                    <option value="5">Every 5 Seconds</option>
+                    <option value="10" selected>Every 10 Seconds</option>
+                </select>
+            </div>
+
+            <div class="pt-2">
+                <button type="submit" id="submitBtn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3.5 px-4 rounded-xl shadow-lg shadow-emerald-600/20 transition duration-200 flex items-center justify-center space-x-2 text-sm">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <span id="btnText">Send Ping</span>
+                </button>
+            </div>
+        </form>
+
+        <!-- Response Console -->
+        <div id="responseBox" class="hidden mx-6 mb-6 p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 space-y-3">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-200 text-slate-400 font-mono">
+                <span>Response Log</span>
+                <span id="responseTimestamp">--:--:--</span>
+            </div>
+            
+            <!-- DID Display & Copy Action -->
+            <div id="didContainer" class="hidden space-y-2">
+                <div class="flex items-center justify-between bg-emerald-50 border border-emerald-100 p-3 rounded-lg">
+                    <div class="font-mono text-emerald-900 font-medium">
+                        <span class="text-slate-500 text-[10px] block uppercase">Target Phone Number</span>
+                        <span id="didText" class="text-base font-bold">--</span>
+                    </div>
+                    <button type="button" id="copyDidBtn" onclick="copyDid()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3.5 py-2 rounded-md transition flex items-center space-x-1.5 shadow-sm font-medium">
+                        <i class="fa-regular fa-copy"></i>
+                        <span id="copyBtnText">Copy Number</span>
+                    </button>
+                </div>
+
+                <!-- Expire In Seconds Box -->
+                <div id="expireContainer" class="hidden flex items-center justify-between bg-amber-50 border border-amber-200 px-3 py-2 rounded-lg font-mono">
+                    <span class="text-amber-800 text-[10px] uppercase font-semibold">Expire In Seconds:</span>
+                    <span id="expireText" class="text-amber-900 font-bold text-sm">--</span>
+                </div>
+
+                <!-- Call Min Duration Box -->
+                <div id="durationContainer" class="hidden flex items-center justify-between bg-slate-100 border border-slate-200 px-3 py-2 rounded-lg font-mono">
+                    <span class="text-slate-500 text-[10px] uppercase font-semibold">Call Min Duration:</span>
+                    <span id="durationText" class="text-slate-800 font-bold text-sm">--</span>
+                </div>
+            </div>
+
+            <div id="noMatchMsg" class="hidden text-center text-slate-500 font-medium py-2">
+                No available agent/DID matched for this CID.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('pingForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+        const statusText = document.getElementById('status-text');
+        const responseBox = document.getElementById('responseBox');
+        const responseTimestamp = document.getElementById('responseTimestamp');
+        const autoIntervalSelect = document.getElementById('auto_interval');
+        const didContainer = document.getElementById('didContainer');
+        const didText = document.getElementById('didText');
+        const expireContainer = document.getElementById('expireContainer');
+        const expireText = document.getElementById('expireText');
+        const durationContainer = document.getElementById('durationContainer');
+        const durationText = document.getElementById('durationText');
+        const noMatchMsg = document.getElementById('noMatchMsg');
+        const copyBtnText = document.getElementById('copyBtnText');
+
+        let autoPingTimer = null;
+        let lastExtractedDid = '';
+
+        const stopAutoPing = () => {
+            if (autoPingTimer) {
+                clearInterval(autoPingTimer);
+                autoPingTimer = null;
+            }
+            autoIntervalSelect.value = "0";
+        };
+
+        const speakSuccess = () => {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance("Success");
+                utterance.rate = 1.1;
+                utterance.pitch = 1.2;
+                window.speechSynthesis.speak(utterance);
+            }
+        };
+
+        const executePing = async () => {
+            let rawPhone = document.getElementById('cid').value.trim();
+            if (!rawPhone) return;
+
+            let formattedPhone = rawPhone.startsWith('+1') ? rawPhone : '+1' + rawPhone.replace(/^\+/, '');
+
+            statusText.textContent = "Sending...";
+            statusText.className = "text-xs font-medium text-amber-600";
+            btnText.textContent = "Processing...";
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/ringba-ping', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        cid: formattedPhone
+                    })
+                });
+
+                const resultText = await response.text();
+                responseBox.classList.remove('hidden');
+                responseTimestamp.textContent = new Date().toLocaleTimeString();
+                
+                try {
+                    const jsonRes = JSON.parse(resultText);
+                    let rawNum = jsonRes.phoneNumberNoPlus || jsonRes.phoneNumber;
+
+                    // 1. Get expireInSeconds from root
+                    let expireVal = jsonRes.expireInSeconds ?? jsonRes.EXPIREINSECONDS;
+
+                    // 2. Get callMinDuration from nested bidTerms array
+                    let callMinDurationVal = null;
+                    if (Array.isArray(jsonRes.bidTerms)) {
+                        for (const term of jsonRes.bidTerms) {
+                            if (term.callMinDuration !== undefined && term.callMinDuration !== null) {
+                                callMinDurationVal = term.callMinDuration;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (rawNum) {
+                        let cleanNum = rawNum.replace(/^\+/, '');
+                        if (cleanNum.startsWith('1') && cleanNum.length === 11) {
+                            cleanNum = cleanNum.substring(1);
+                        }
+
+                        lastExtractedDid = cleanNum;
+                        didText.textContent = lastExtractedDid;
+
+                        // Display Expire In Seconds
+                        if (expireVal !== undefined && expireVal !== null && expireVal !== '') {
+                            expireText.textContent = expireVal;
+                            expireContainer.classList.remove('hidden');
+                        } else {
+                            expireContainer.classList.add('hidden');
+                        }
+
+                        // Display Call Min Duration
+                        if (callMinDurationVal !== undefined && callMinDurationVal !== null && callMinDurationVal !== '') {
+                            durationText.textContent = callMinDurationVal + "s";
+                            durationContainer.classList.remove('hidden');
+                        } else {
+                            durationContainer.classList.add('hidden');
+                        }
+
+                        didContainer.classList.remove('hidden');
+                        noMatchMsg.classList.add('hidden');
+                        
+                        stopAutoPing();
+                        speakSuccess();
+                    } else {
+                        didContainer.classList.add('hidden');
+                        noMatchMsg.classList.remove('hidden');
+                    }
+                } catch (e) {
+                    didContainer.classList.add('hidden');
+                    noMatchMsg.classList.remove('hidden');
+                }
+
+                statusText.textContent = "Online";
+                statusText.className = "text-xs font-medium text-emerald-600";
+            } catch (error) {
+                responseBox.classList.remove('hidden');
+                responseTimestamp.textContent = new Date().toLocaleTimeString();
+                didContainer.classList.add('hidden');
+                noMatchMsg.classList.remove('hidden');
+                noMatchMsg.textContent = "Error: " + error.message;
+                
+                statusText.textContent = "Error";
+                statusText.className = "text-xs font-medium text-rose-600";
+            } finally {
+                btnText.textContent = "Send Ping";
+                submitBtn.disabled = false;
+            }
+        };
+
+        const copyDid = () => {
+            if (!lastExtractedDid) return;
+            navigator.clipboard.writeText(lastExtractedDid).then(() => {
+                copyBtnText.textContent = "Copied!";
+                setTimeout(() => {
+                    copyBtnText.textContent = "Copy Number";
+                }, 2000);
+            });
+        };
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            executePing();
+        });
+
+        autoIntervalSelect.addEventListener('change', (e) => {
+            if (autoPingTimer) {
+                clearInterval(autoPingTimer);
+                autoPingTimer = null;
+            }
+
+            const intervalSeconds = parseInt(e.target.value);
+            if (intervalSeconds > 0) {
+                autoPingTimer = setInterval(() => {
+                    const phoneVal = document.getElementById('cid').value.trim();
+                    if (phoneVal) {
+                        executePing();
+                    }
+                }, intervalSeconds * 1000);
+            }
+        });
+    </script>
+</body>
+</html>
 
